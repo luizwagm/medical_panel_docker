@@ -1,0 +1,39 @@
+version: '3.7'
+services:
+    api:
+        hostname: medical-panel-api
+        container_name: medical_panel_api
+        build:
+            context: './medical_panel_api/'
+            dockerfile: Dockerfile
+        ports:
+            - '8080:80'
+        volumes:
+            - './medical_panel_api:/var/www'
+        networks:
+            medical_panel:
+                ipv4_address: 10.6.0.5
+        depends_on:
+            - mysql
+    mysql:
+        container_name: medical_panel_database
+        image: 'mysql/mysql-server:8.0'
+        ports:
+            - '3306:3306'
+        tty: true
+        environment:
+            MYSQL_ROOT_PASSWORD: 'root'
+            MYSQL_ROOT_HOST: "%"
+            MYSQL_DATABASE: 'medical_panel'
+            MYSQL_USER: 'medical-dev'
+            MYSQL_PASSWORD: 'medical-dev'
+        restart: unless-stopped
+        networks:
+            medical_panel:
+                ipv4_address: 10.6.0.6
+networks:
+  medical_panel:
+    driver: bridge
+    ipam:
+     config:
+       - subnet: 10.6.0.0/16
